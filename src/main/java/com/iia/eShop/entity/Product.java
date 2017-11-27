@@ -18,25 +18,23 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "product")
-public class Product {
-	/** id of the Product */
-    @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
-    private Long id;
+public class Product extends EntityBase{
+
+	
     /** name of the Product */
-    @Column
+    @Column(unique=true)
     private String name;
     /** description of the Product */
-    @Column
+    @Column(length=255)
    	private String description;
     /** quantity of the Product */
    	@Column
-    private int quantity;
+    private int quantity = 0;
    	/** determinate if the product is sold-out or not */
    	@Column
     private boolean dead;
    	/** price of the Product */
-   	@Column
+   	@Column(precision=2)
     private float price;
    	  
    	  
@@ -63,53 +61,15 @@ public class Product {
       }
       
     
-    /** 
-     * Return all information concerning a Order to string
-     */
-      @Override
+    	/** 
+    	 * Return all information concerning a Order to string
+    	 */
+      	@Override
 	    public String toString() {
 	        return String.format("Product[name='%s', description='%s', quantity='%s', dead='%s', price='%s']", this.name , this.description, this.quantity, this.dead, this.price);
 	    }
       
-  
-      /**
-       * Defines a many-valued association to Order
-       */
-	  	@ManyToMany(targetEntity = Order.class, mappedBy = "products")
-	  	private Set<Order> orders = new HashSet<>();
-	  	
-	  	
-	  	/**
-	  	 * @return the orders
-	  	 */
-	  	public Set<Order> getOrders() {
-	  		return orders;
-	  	}
-	
-	  	/**
-	  	 * @param orders A list of orders to set
-	  	 * @return this orders
-	  	 */
-	  	public Product setOrders(Set<Order> orders) {
-	  		this.orders = orders;
-	  		return this;
-	  	}
-	 
-	  	
-    
-	    /**
-		 * @return the id
-		 */
-		public Long getId() {
-			return id;
-		}
-	
-		/**
-		 * @param id the id to set
-		 */
-		public void setId(Long id) {
-			this.id = id;
-		}
+
 	
 		/**
 		 * @return the name

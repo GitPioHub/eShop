@@ -1,5 +1,6 @@
 package com.iia.eShop.entity;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,6 +15,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 
@@ -24,11 +26,9 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "my_order")
-public class Order {
-		/** id of the order */
-	 	@Id
-	    @GeneratedValue(strategy=GenerationType.AUTO)
-	    private Long id;
+public class Order extends EntityBase{
+		
+	
 	 	/** date of the order */
 	    @Column
 	    private String date;
@@ -38,14 +38,21 @@ public class Order {
 	    /** total price of the order */
 	    @Column
 	    private float totalPrice;
-	    	    
+	    
 	    
 	    /**
-	     * Empty constructor of the Customer class
+	     * Defines a many-valued association to Customer
 	     */
-	    protected Order() {}
+	    @ManyToOne
+		private Customer customer;
 	    
-	    
+		/**
+	     * Defines a many-valued association to Product
+	     * by joining the product_order table
+	     */
+		 @OneToMany(mappedBy="order", cascade=CascadeType.ALL)
+		 private List<ProductOrder> products;
+	    	    
 	    /**
 	     * Constructor of the Order class
 	     * @param date
@@ -53,13 +60,39 @@ public class Order {
 	     * @param totalprice
 	     * @param customer
 	     */
-	    public Order(String date, StateOrder state, float totalprice, Customer customer) {
+	    public Order(String date, StateOrder state, float totalprice) {
 	        this.date = date;
 	        this.state  = state;
 	        this.totalPrice = totalprice;
-	        this.customer = customer;	        
+	                
+	        this.products = new ArrayList<ProductOrder>();
 	    }
+	     
+	    protected Order() {}
 	    
+	    
+	 	/**
+	 	 * @return a Customer
+	 	 */
+	 	public Customer getCustomer() {
+			return this.customer;
+		}
+
+		
+	    /**
+	     * @param customer the customer to set
+	     */
+	    public Order setCustomer(Customer customer) {
+	        this.customer = customer;
+
+	        // Bidirectional check
+	        if (customer != null && !customer.getOrders().contains(this)) {
+	            customer.addOrder(this);
+	        }
+
+	        return this;
+	    }
+	 	
 	    /** 
 	     * Return all information concerning a Order to string
 	     */
@@ -68,82 +101,12 @@ public class Order {
 	        return String.format("Order[date='%s', state='%s', totalprice='%s']", this.date , this.state, this.totalPrice);
 	    }
 	    
-	    
-	    
-	    /**
-	     * Defines a many-valued association to Customer
-	     */
-	    @ManyToOne
-		private Customer customer;
-	   	   
-	    
-	 	/**
-	 	 * @return a Customer
-	 	 */
-	 	public Customer getCustomer() {
-			return customer;
-		}
-	 	
-		
-		/**
-		 * @param customer a Customer to set 
-		 * @return the Order 
-		 */
-		public Order setCustomer(Customer customer) {
-			this.customer = customer;
-			return this;			
-		}
-		
-		
-		
-		/**
-	     * Defines a many-valued association to Product
-	     * by joining the product_order table
-	     */
-		@ManyToMany(targetEntity = Product.class, cascade=CascadeType.MERGE)
-		
-		@JoinTable(
-				name = "product_order",
-				joinColumns = @JoinColumn(name = "order_id"),
-				inverseJoinColumns = {@JoinColumn(name = "product_id")})
-		private Set<Product> products = new HashSet<>();
-
-		/**
-		 * @return the products
-		 */
-		public Set<Product> getProducts() {
-			return products;
-		}
 
 		
-		/**
-		 * @param products the product to set
-		 * @return this Order
-		 */
-		public Order setProducts(Set<Product> products) {
-			this.products = products;
-			return this;
-		}
 		
 
 		
-	
 		
-		
-	/**
-	 * @return the id
-	 */
-	public Long getId() {
-		return id;
-	}
-	
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(Long id) {
-		this.id = id;
-	}
-	
 	/**
 	 * @return the date
 	 */
@@ -185,6 +148,34 @@ public class Order {
 	public void setTotalPrice(float totalPrice) {
 		this.totalPrice = totalPrice;
 	}
+
+	    
+		 public Order addProduct(Product product, int qt) {
+		        ProductOrder item = new ProductOrder(this, product, qt);
+		        this.products.add(item);
+
+		        return this;
+		    }
+		 
+		 public List<ProductOrder> getOrderedProduct(){
+			 return this.products;
+		 }
+		 
+		 
+		 public void removeProduct(Product product, int qt) {
+			 ProductOrder finded = null;
+		        for (ProductOrder orderProduct : this.products) {
+		            if (orderProduct.getProduct().equals(product)) {
+		                finded = orderProduct;
+		            }
+		        }
+
+		        finded.setQuantity(finded.getQuantity() - qt);
+		        if (finded.getQuantity() <= 0) {
+		            this.products.remove(finded);
+		        }
+		    }
+
 		
 
 	    
