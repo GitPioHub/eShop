@@ -42,9 +42,40 @@ public class Customer extends EntityBase{
     /** city of the Customer */
     @Column(length=25)
     private String city;
+    
+   
+    /** username of the Customer */
+    @Column(length=25)
+    private String username;
+    
+    /** password of the Customer */
+    @Column(length=25)
+    private String password;
             
 
-    /**
+    public String getUsername() {
+		return username;
+	}
+
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+
+	public String getPassword() {
+		return password;
+	}
+
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+
+
+
+	/**
      * Defines a many-valued association to Order
      */
     @OneToMany(mappedBy="customer", cascade=CascadeType.PERSIST)
@@ -67,13 +98,15 @@ public class Customer extends EntityBase{
      * @param cP
      * @param city
      */
-    public Customer(String firstName, String lastName, String phone, String address, int cP, String city) {
+    public Customer(String firstName, String lastName, String phone, String address, int cP, String city, String username, String password) {
         this.firstName = firstName;
         this.lastName  = lastName;
         this.phone = phone;
         this.address = address;
         this.cP = cP;
         this.city = city;
+        this.username = username;
+        this.password = password;
         
         this.orders = new ArrayList<Order>();      
     }

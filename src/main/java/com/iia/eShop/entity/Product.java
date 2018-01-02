@@ -36,9 +36,23 @@ public class Product extends EntityBase{
    	/** price of the Product */
    	@Column(precision=2)
     private float price;
+   	
+    /** name of the photoProduct */
+    @Column
+    private String pathPhoto;
    	  
    	  
-     /**
+     public String getPathPhoto() {
+		return pathPhoto;
+	}
+
+
+	public void setPathPhoto(String pathPhoto) {
+		this.pathPhoto = pathPhoto;
+	}
+
+
+	/**
      * Empty constructor of the Product class
      */
     protected Product() {}
@@ -52,12 +66,13 @@ public class Product extends EntityBase{
      * @param dead
      * @param price
      */
-    public Product (String name, String description, int quantity, boolean dead, float price) {
+    public Product (String name, String description, int quantity, boolean dead, float price, String pathPhoto) {
       	this.name = name;
       	this.description = description;
       	this.quantity = quantity;
       	this.dead = dead;
       	this.price = price;
+      	this.pathPhoto = pathPhoto;
       }
       
     
